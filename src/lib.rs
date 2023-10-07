@@ -92,27 +92,16 @@ pub fn register_logging(writer: NonBlocking) -> anyhow::Result<()> {
 
     let log_mode = match std::env::var("LOG_MODE") {
         Ok(mode) => mode,
-        Err(_) => {
-            println!("environment variable `LOG_MODE` not found, use default value 'local'.");
-            String::from("local")
-        }
+        Err(_) => String::from("local"),
     };
 
     let log_level = match std::env::var("RUST_LOG") {
         Ok(input) => match tracing::Level::from_str(&input) {
             Ok(level) => level,
-            Err(_) => {
-                eprintln!("invalid environment variable `RUST_LOG` ({input}), fallback to use default value 'INFO'.");
-                tracing::Level::INFO
-            }
+            Err(_) => tracing::Level::INFO,
         },
-        Err(_) => {
-            println!("environment variable `RUST_LOG` not found, use default value 'INFO'.");
-            tracing::Level::INFO
-        }
+        Err(_) => tracing::Level::INFO,
     };
-
-    println!("using `RUST_LOG` {}", log_level);
 
     match log_mode.to_lowercase().as_str() {
         "local" => {
@@ -133,21 +122,6 @@ pub fn register_logging(writer: NonBlocking) -> anyhow::Result<()> {
                         .add_directive("librdkafka=off".parse()?),
                 )
                 .init();
-        }
-        "cloud" => {
-            // construct a subscriber that prints formatted traces to stdout
-            let subscriber = tracing_subscriber::FmtSubscriber::builder()
-                // .with_max_level(TRACING_LEVEL.get().into())
-                .with_thread_ids(true)
-                .with_thread_names(true)
-                .json()
-                .finish();
-
-            // use that subscriber to process traces emitted after this point
-            match tracing::subscriber::set_global_default(subscriber) {
-                Ok(_) => {}
-                Err(_) => panic!("Failed to subscribe to tracing logs"),
-            };
         }
         _ => unreachable!(
             "Invalid LOG_MODE: {} (only 'local' and 'cloud' are valid option)",

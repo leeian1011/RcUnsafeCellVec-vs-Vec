@@ -35,4 +35,6 @@ j) HashMap-Entry : 1    |  Vector-Size : 1000
 average nano-seconds/iterations : 
 
 nevermind.
+
+![why](why.png)
 ![cursed](sadge.png)

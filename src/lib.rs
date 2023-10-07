@@ -36,20 +36,6 @@ impl ExampleEnumTwo {
     }
 }
 
-pub struct ExampleCell<T> {
-    celled: UnsafeCell<T>,
-}
-
-unsafe impl<ExampleObject> Sync for ExampleCell<Vec<ExampleObject>> {}
-
-impl<T> ExampleCell<T> {
-    pub fn new(data: T) -> Self {
-        Self {
-            celled: UnsafeCell::new(data),
-        }
-    }
-}
-
 pub struct ExampleObject {
     x: f64,
     y: ExampleEnum,
@@ -66,13 +52,13 @@ impl ExampleObject {
         vector
     }
 
-    pub fn generate_rr_vec(count: usize) -> Rc<ExampleCell<Vec<Self>>> {
+    pub fn generate_rr_vec(count: usize) -> Rc<UnsafeCell<Vec<Self>>> {
         let mut vector: Vec<ExampleObject> = vec![];
         for _ in 0..count {
             vector.push(Self::generate_random());
         }
 
-        Rc::new(ExampleCell::new(vector))
+        Rc::new(UnsafeCell::new(vector))
     }
 
     pub fn generate_random() -> Self {

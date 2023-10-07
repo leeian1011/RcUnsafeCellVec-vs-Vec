@@ -1,5 +1,5 @@
+use std::cell::UnsafeCell;
 use timer::register_logging;
-use timer::ExampleCell;
 use timer::ExampleObject;
 
 use std::{collections::HashMap, env, rc::Rc, time::UNIX_EPOCH};
@@ -25,7 +25,7 @@ fn main() {
     let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
     let _ = register_logging(non_blocking);
 
-    let mut arc_uc_hashmap: HashMap<usize, Rc<ExampleCell<Vec<ExampleObject>>>> = HashMap::new();
+    let mut arc_uc_hashmap: HashMap<usize, Rc<UnsafeCell<Vec<ExampleObject>>>> = HashMap::new();
 
     for i in 0..hashmap_entry_count {
         arc_uc_hashmap.insert(i, ExampleObject::generate_rr_vec(vector_size));

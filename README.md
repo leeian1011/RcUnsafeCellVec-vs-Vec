@@ -35,4 +35,4 @@ j) HashMap-Entry : 1    |  Vector-Size : 1000
 average nano-seconds/iterations : 
 
 nevermind.
-!(cursed)[./Screenshot from 2023-10-07 21-58-21.png]
+![cursed](sadge.png)

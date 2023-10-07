@@ -33,7 +33,7 @@ fn main() {
 
     loop {
         let start = UNIX_EPOCH.elapsed().unwrap().as_nanos();
-        for i in 0..100 {
+        for i in 0..hashmap_entry_count {
             let _ = normal_hashmap.get(&i).unwrap().clone();
         }
         let end = UNIX_EPOCH.elapsed().unwrap().as_nanos();

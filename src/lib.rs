@@ -1,58 +1,91 @@
-use std::{
-    cell::UnsafeCell,
-    collections::HashMap,
-    str::FromStr,
-    sync::{Arc, OnceLock},
-    time::{Duration, SystemTime, UNIX_EPOCH},
-};
-
-use models::ExampleCell;
+use rand::{thread_rng, Rng};
+use std::cell::UnsafeCell;
+use std::rc::Rc;
+use std::str::FromStr;
 use tracing_appender::non_blocking::NonBlocking;
-
-mod models;
-static LOG_FILENAME: OnceLock<String> = OnceLock::new();
-
-fn main() {
-    LOG_FILENAME.get_or_init(|| String::from("normalhashmap.log"));
-    let file_appender = tracing_appender::rolling::minutely("./logs/", LOG_FILENAME.get().unwrap());
-    let (non_blocking, _guard) = tracing_appender::non_blocking(file_appender);
-    let _ = register_logging(non_blocking);
-
-    let mut normal_hashmap: HashMap<usize, Vec<models::ExampleObject>> = HashMap::new();
-
-    for i in 0..100 {
-        normal_hashmap.insert(i, models::ExampleObject::generate_vec(100));
-    }
-
-    std::thread::spawn(move || loop {
-        let start = UNIX_EPOCH.elapsed().unwrap().as_nanos();
-        for i in 0..100 {
-            let _ = normal_hashmap.get(&i).unwrap().clone();
-        }
-        let end = UNIX_EPOCH.elapsed().unwrap().as_nanos();
-        tracing::info!("{}", end - start);
-    });
-
-    let mut arc_uc_hashmap: HashMap<usize, Arc<ExampleCell<Vec<models::ExampleObject>>>> =
-        HashMap::new();
-
-    for i in 0..100 {
-        arc_uc_hashmap.insert(i, models::ExampleObject::generate_rr_vec(100));
-    }
-
-    std::thread::spawn(move || loop {
-        let start = UNIX_EPOCH.elapsed().unwrap().as_nanos();
-        for i in 0..100 {
-            let _ = arc_uc_hashmap.get(&i).unwrap().clone();
-        }
-        let end = UNIX_EPOCH.elapsed().unwrap().as_nanos();
-        tracing::info!("RC/UNSAFECELL HashMap => {}", end - start);
-    });
-
-    std::thread::sleep(Duration::from_secs(5));
+pub enum ExampleEnum {
+    One,
+    Two,
+    Three,
 }
 
-fn register_logging(writer: NonBlocking) -> anyhow::Result<()> {
+impl ExampleEnum {
+    fn gen_random() -> Self {
+        let rand = thread_rng().gen_range(0..2);
+        match rand {
+            0 => Self::One,
+            1 => Self::Two,
+            2 => Self::Three,
+            _ => unreachable!("???"),
+        }
+    }
+}
+
+pub enum ExampleEnumTwo {
+    Four,
+    Five,
+}
+
+impl ExampleEnumTwo {
+    fn gen_random() -> Self {
+        let rand = thread_rng().gen_bool(0.5);
+        match rand {
+            true => Self::Four,
+            false => Self::Five,
+        }
+    }
+}
+
+pub struct ExampleCell<T> {
+    celled: UnsafeCell<T>,
+}
+
+unsafe impl<ExampleObject> Sync for ExampleCell<Vec<ExampleObject>> {}
+
+impl<T> ExampleCell<T> {
+    pub fn new(data: T) -> Self {
+        Self {
+            celled: UnsafeCell::new(data),
+        }
+    }
+}
+
+pub struct ExampleObject {
+    x: f64,
+    y: ExampleEnum,
+    z: ExampleEnumTwo,
+}
+
+impl ExampleObject {
+    pub fn generate_vec(count: usize) -> Vec<Self> {
+        let mut vector: Vec<ExampleObject> = vec![];
+        for _ in 0..count {
+            vector.push(Self::generate_random());
+        }
+
+        vector
+    }
+
+    pub fn generate_rr_vec(count: usize) -> Rc<ExampleCell<Vec<Self>>> {
+        let mut vector: Vec<ExampleObject> = vec![];
+        for _ in 0..count {
+            vector.push(Self::generate_random());
+        }
+
+        Rc::new(ExampleCell::new(vector))
+    }
+
+    pub fn generate_random() -> Self {
+        let rand: f64 = thread_rng().gen();
+        Self {
+            x: rand,
+            y: ExampleEnum::gen_random(),
+            z: ExampleEnumTwo::gen_random(),
+        }
+    }
+}
+
+pub fn register_logging(writer: NonBlocking) -> anyhow::Result<()> {
     use tracing_subscriber::{
         fmt::Layer, prelude::__tracing_subscriber_SubscriberExt, util::SubscriberInitExt, EnvFilter,
     };

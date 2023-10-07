@@ -37,4 +37,6 @@ average nano-seconds/iterations :
 nevermind.
 
 ![why](why.png)
-![cursed](sadge.png)
+
+![cursed](damn.png)
+

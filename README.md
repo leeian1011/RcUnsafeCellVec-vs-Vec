@@ -19,24 +19,11 @@ So I have set these variables.<br>
 
 Iterations = 1000
 
-a) HashMap-Entry : 1    |  Vector-Size : 1
-b) HashMap-Entry : 10   |  Vector-Size : 1 
-c) HashMap-Entry : 10   |  Vector-Size : 10
-d) HashMap-Entry : 10   |  Vector-Size : 100 
-e) HashMap-Entry : 100  |  Vector-Size : 10
-f) HashMap-Entry : 100  |  Vector-Size : 100
-g) HashMap-Entry : 1    |  Vector-Size : 100
-h) HashMap-Entry : 100  |  Vector-Size : 1 
-i) HashMap-Entry : 1000 |  Vector-Size : 1
-j) HashMap-Entry : 1    |  Vector-Size : 1000
-
-*All times are measured in nanoseconds. The log files are also provided. All tests were ran in --release* 
-
-average nano-seconds/iterations : 
-
-nevermind.
-
-![why](why.png)
+HashMap-Entries : 1  |  Vector-Size: 1..5 & 10;
 
 ![cursed](damn.png)
+
+It took me way too long to benchmark this and I made a few mistakes, such as not deriving clone for `ExampleObject` and mixing up Hashmap-Entry with Vector-size.
+All in all I end up learning a lot from short thought experiment :p
+![why](why.png)
 

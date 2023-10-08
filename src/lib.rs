@@ -3,6 +3,8 @@ use std::cell::UnsafeCell;
 use std::rc::Rc;
 use std::str::FromStr;
 use tracing_appender::non_blocking::NonBlocking;
+
+#[derive(Clone)]
 pub enum ExampleEnum {
     One,
     Two,
@@ -21,6 +23,7 @@ impl ExampleEnum {
     }
 }
 
+#[derive(Clone)]
 pub enum ExampleEnumTwo {
     Four,
     Five,
@@ -36,6 +39,7 @@ impl ExampleEnumTwo {
     }
 }
 
+#[derive(Clone)]
 pub struct ExampleObject {
     x: f64,
     y: ExampleEnum,

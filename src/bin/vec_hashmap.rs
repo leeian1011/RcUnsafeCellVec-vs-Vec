@@ -13,9 +13,7 @@ fn main() {
     }
 
     let vector_size: usize = arguments[1].clone().parse().expect("no vector size");
-    if vector_size < 1 {
-        panic!("minimum vec size of 1");
-    }
+
     let hashmap_entry_count: usize = arguments[2].clone().parse().expect("no hashmap size");
     if hashmap_entry_count < 1 {
         panic!("minimum entry size of 1");
